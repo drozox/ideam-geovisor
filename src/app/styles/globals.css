@@ -1,0 +1,53 @@
+/* src/app/globals.css */
+/* Importa primero la hoja de estilos oficial de Leaflet */
+@import "tailwindcss";
+@import url('leaflet/dist/leaflet.css');
+
+
+/* Variables / tipografías (opcional) */
+:root {
+  --font-geist-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+}
+
+/* Suavizado */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body: deja que Tailwind controle fondo/colores desde el layout */
+body {
+  margin: 0;
+  font-family: var(--font-geist-sans);
+  /* no pongas aquí background que sobreescriba Tailwind */
+}
+
+/* --- Reglas útiles para Leaflet (no tocan iconos) --- */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Popups / controles estéticos */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.5rem;
+}
+.leaflet-popup-content {
+  margin: 0;
+}
+
+/* Mejora estilo zoom control (opcional) */
+.leaflet-control-zoom a {
+  border: none;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  border-radius: 0.5rem;
+}
+
+/* IMPORTANTE: NO incluir ninguna regla que ponga
+   background-image: url('marker-icon.png') globalmente.
+   Si encontrás eso en tu repo, bórralo. */
