@@ -24,7 +24,7 @@ Aplicación web para visualizar estaciones meteorológicas del IDEAM sobre un ma
 
 ## Variables De Entorno
 
-Crea un archivo `.env.local` en la raíz del proyecto usando `.env.example` como referencia:
+Crea un archivo `.env.local` en la raíz del proyecto con estas variables:
 
 ```env
 NEXT_PUBLIC_IDEAM_APP_TOKEN=tu_token_de_datos_gov_co

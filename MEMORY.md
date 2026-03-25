@@ -69,6 +69,7 @@ Enfoque actual:
 - [2026-03-25] Se valido el runtime de las rutas compiladas de Next contra Supabase poblado: `/api/stations`, `/api/dashboard/summary` y `/api/stations/[stationId]/history` respondieron 200 para el stationId `0024035510`.
 - [2026-03-25] Se agrego `scripts/check-ingestion-runs.mjs` y el script `npm run db:check-ingestion` para monitorear `ingestion_runs`, detectar corridas stale y revisar fallos recientes. La politica operativa recomendada para este proyecto pequeno quedo en ingesta horaria.
 - [2026-03-25] Se corrigio el warning de React por keys duplicadas en `src/components/dashboard/StationHistoryPanel.tsx` usando una key compuesta y se agrego una prueba de regresion en `src/components/dashboard/StationHistoryPanel.test.tsx`. La validacion posterior paso con `npm run test` y `npm run build`.
+- [2026-03-25] Se ajusto `.gitignore` para excluir tests, `src/test`, `vitest.config.ts`, logs temporales y archivos de entorno de ejemplo. Los tests y archivos auxiliares se sacaron del indice de Git, pero permanecen disponibles localmente. El build siguio pasando despues de ese cambio.
 
 # Pendientes
 
