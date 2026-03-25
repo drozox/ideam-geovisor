@@ -70,6 +70,8 @@ Enfoque actual:
 - [2026-03-25] Se agrego `scripts/check-ingestion-runs.mjs` y el script `npm run db:check-ingestion` para monitorear `ingestion_runs`, detectar corridas stale y revisar fallos recientes. La politica operativa recomendada para este proyecto pequeno quedo en ingesta horaria.
 - [2026-03-25] Se corrigio el warning de React por keys duplicadas en `src/components/dashboard/StationHistoryPanel.tsx` usando una key compuesta y se agrego una prueba de regresion en `src/components/dashboard/StationHistoryPanel.test.tsx`. La validacion posterior paso con `npm run test` y `npm run build`.
 - [2026-03-25] Se ajusto `.gitignore` para excluir tests, `src/test`, `vitest.config.ts`, logs temporales y archivos de entorno de ejemplo. Los tests y archivos auxiliares se sacaron del indice de Git, pero permanecen disponibles localmente. El build siguio pasando despues de ese cambio.
+- [2026-03-25] Se refino visualmente el panel `StationHistoryPanel`: el grafico historico ahora tiene area rellena, lineas guia, puntos visibles, resumen de min/promedio/maximo, variacion entre primer y ultimo dato y una lista de registros mas legible. La validacion posterior paso con `npm run build`.
+- [2026-03-25] Se limpio el mojibake visible en el subtitulo del panel historico y se mantuvo la mejora visual del grafico con validacion posterior via `npm run build`.
 
 # Pendientes
 

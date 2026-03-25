@@ -197,13 +197,13 @@ function MapLegend({ stations }: { stations: Station[] }) {
   const legendItems = useMemo(() => buildLegendItems(stations), [stations]);
 
   return (
-    <div className="pointer-events-none absolute right-4 top-4 z-[500] max-w-48 rounded-lg border border-gray-200 bg-white/95 p-3 shadow-md backdrop-blur-sm">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-700">
+    <div className="pointer-events-none absolute right-4 top-4 z-[500] max-w-52 rounded-[1.2rem] border border-white/60 bg-white/88 p-4 shadow-[0_18px_42px_rgba(8,24,29,0.12)] backdrop-blur-md">
+      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#58757b]">
         Leyenda
       </h3>
       <div className="space-y-2">
         {legendItems.map((item) => (
-          <div key={item.label} className="flex items-center gap-2 text-xs text-gray-700">
+          <div key={item.label} className="flex items-center gap-2 text-xs text-[#3d5d63]">
             <span
               className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold text-white"
               style={{ backgroundColor: item.color }}
@@ -213,7 +213,7 @@ function MapLegend({ stations }: { stations: Station[] }) {
             <span>{item.label}</span>
           </div>
         ))}
-        <div className="flex items-center gap-2 text-xs text-gray-700">
+        <div className="flex items-center gap-2 text-xs text-[#3d5d63]">
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-700 text-[10px] font-semibold text-white">
             #
           </span>
@@ -230,7 +230,15 @@ export default function BasicMap({
   onSelectStation,
 }: BasicMapProps) {
   return (
-    <div className="relative h-[calc(90vh-6rem)] w-full overflow-hidden rounded-lg border border-gray-200 shadow-lg">
+    <div className="relative h-[calc(90vh-6rem)] w-full overflow-hidden rounded-[1.7rem] border border-[#d7e7e9] shadow-[0_22px_55px_rgba(8,24,29,0.12)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[450] flex items-center justify-between px-4 py-4">
+        <div className="rounded-full border border-white/12 bg-[#08252a]/84 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#c3e8ed] backdrop-blur-sm">
+          Colombia · lectura espacial
+        </div>
+        <div className="rounded-full border border-white/12 bg-white/86 px-3 py-2 text-xs font-semibold text-[#0d2f36] shadow-[0_10px_24px_rgba(8,24,29,0.08)] backdrop-blur-sm">
+          {stations.length.toLocaleString("es-CO")} estaciones
+        </div>
+      </div>
       <MapContainer
         center={COLOMBIA_CENTER}
         zoom={6}

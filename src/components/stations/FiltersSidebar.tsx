@@ -26,13 +26,18 @@ export default function FiltersSidebar({
   ].filter(Boolean).length;
 
   return (
-    <section className="border-b border-gray-200 bg-gradient-to-b from-slate-50 to-white p-4">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="border-b border-[#d7e7e9] bg-[linear-gradient(180deg,_rgba(244,251,251,0.96)_0%,_rgba(235,246,247,0.92)_100%)] p-5">
+      <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-[#00a3b4]" />
-          <h2 className="text-base font-semibold text-gray-900">Filtros</h2>
+          <div className="rounded-2xl border border-[#cce7ea] bg-white/80 p-2">
+            <Filter className="h-4 w-4 text-[#0f7681]" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-[#0b2429]">Filtros</h2>
+            <p className="text-xs text-[#648086]">Refina la cobertura visible</p>
+          </div>
         </div>
-        <span className="rounded-full bg-[#00a3b4]/10 px-2 py-1 text-xs font-medium text-[#007b88]">
+        <span className="rounded-full border border-[#cae8eb] bg-white/90 px-3 py-1 text-xs font-medium text-[#0f7681]">
           {activeFiltersCount} activos
         </span>
       </div>
@@ -65,7 +70,7 @@ export default function FiltersSidebar({
         onChange={(value) => onFilterChange("descripcionsensor", value)}
       />
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 flex gap-2">
         <Button className="flex-1 bg-[#00a3b4] hover:bg-[#00b9cc]" onClick={onApply}>
           Aplicar
         </Button>
@@ -97,8 +102,8 @@ function FilterSelect({
   onChange,
 }: FilterSelectProps) {
   return (
-    <div className="mb-3">
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+    <div className="mb-4">
+      <label htmlFor={id} className="mb-2 block text-[13px] font-semibold text-[#3f5d63]">
         {label}
       </label>
       <div className="relative">
@@ -107,7 +112,7 @@ function FilterSelect({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
-          className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-[#00a3b4] focus:outline-none focus:ring-1 focus:ring-[#00a3b4] disabled:bg-gray-100 disabled:text-gray-400"
+          className="block w-full appearance-none rounded-2xl border border-[#cfe3e6] bg-white/95 py-3 pl-4 pr-10 text-sm text-[#12343a] shadow-[0_10px_22px_rgba(8,24,29,0.04)] focus:border-[#0f7681] focus:outline-none focus:ring-2 focus:ring-[#0f7681]/15 disabled:bg-[#edf3f4] disabled:text-[#8aa4a9]"
         >
           <option value="">{placeholder}</option>
           {options.map((option) => (
@@ -116,7 +121,7 @@ function FilterSelect({
             </option>
           ))}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#6a878c]">
           <ChevronDown size={16} />
         </div>
       </div>

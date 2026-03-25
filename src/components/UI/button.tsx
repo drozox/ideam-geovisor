@@ -15,13 +15,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f7681] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           {
-            "bg-primary text-primary-foreground hover:bg-primary/90": variant === "default",
+            "bg-[#0f7681] text-white shadow-[0_12px_30px_rgba(15,118,129,0.24)] hover:bg-[#0c6670] hover:shadow-[0_18px_38px_rgba(15,118,129,0.26)]": variant === "default",
             "bg-destructive text-destructive-foreground hover:bg-destructive/90": variant === "destructive",
-            "border border-input bg-background hover:bg-accent hover:text-accent-foreground": variant === "outline",
-            "bg-secondary text-secondary-foreground hover:bg-secondary/80": variant === "secondary",
-            "hover:bg-accent hover:text-accent-foreground": variant === "ghost",
+            "border border-[#cfe3e6] bg-white/88 text-[#12343a] shadow-[0_8px_20px_rgba(8,24,29,0.05)] hover:border-[#9ecdd2] hover:bg-[#eef8f8]": variant === "outline",
+            "bg-[#e6f6f7] text-[#0d2f36] hover:bg-[#d8f0f2]": variant === "secondary",
+            "text-[#0d2f36] hover:bg-white/70 hover:text-[#0a2025]": variant === "ghost",
             "text-primary underline-offset-4 hover:underline": variant === "link",
           },
           {

@@ -8,8 +8,8 @@ const BasicMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-[600px] bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex h-[600px] items-center justify-center rounded-[1.7rem] bg-[linear-gradient(180deg,_#eef8f8_0%,_#dceef0_100%)]">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#0f7681]"></div>
       </div>
     ),
   },

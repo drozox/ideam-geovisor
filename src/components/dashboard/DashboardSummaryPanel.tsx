@@ -25,7 +25,7 @@ export default function DashboardSummaryPanel({
         {Array.from({ length: 4 }, (_, index) => (
           <div
             key={index}
-            className="h-32 animate-pulse rounded-2xl border border-slate-200 bg-white"
+            className="h-36 animate-pulse rounded-[1.7rem] border border-white/70 bg-white/75 shadow-[0_16px_40px_rgba(8,24,29,0.08)]"
           />
         ))}
       </section>
@@ -37,7 +37,7 @@ export default function DashboardSummaryPanel({
       error instanceof Error ? error.message : "No fue posible cargar el dashboard.";
 
     return (
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900 shadow-sm">
+      <section className="rounded-[1.8rem] border border-amber-200/70 bg-[linear-gradient(135deg,_#fff7df_0%,_#fff1c8_100%)] p-5 text-amber-900 shadow-[0_16px_40px_rgba(122,74,12,0.08)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.22em]">
@@ -136,22 +136,28 @@ function MetricCard({
   tone: "cyan" | "slate" | "amber" | "emerald";
 }) {
   const toneClasses = {
-    cyan: "border-cyan-200 bg-cyan-50 text-cyan-900",
-    slate: "border-slate-200 bg-slate-50 text-slate-900",
-    amber: "border-amber-200 bg-amber-50 text-amber-900",
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-900",
+    cyan: "border-[#bbe7ec] bg-[linear-gradient(180deg,_#f4fcfd_0%,_#dcf5f8_100%)] text-[#0d3c43]",
+    slate: "border-[#d7e6e8] bg-[linear-gradient(180deg,_#ffffff_0%,_#eef6f7_100%)] text-[#132f35]",
+    amber: "border-[#f1d59f] bg-[linear-gradient(180deg,_#fff8e8_0%,_#ffecc0_100%)] text-[#714909]",
+    emerald: "border-[#b9ebd8] bg-[linear-gradient(180deg,_#f1fdf7_0%,_#daf8e8_100%)] text-[#185a44]",
   } as const;
 
   return (
-    <article className={`rounded-2xl border p-5 shadow-sm ${toneClasses[tone]}`}>
-      <div className="flex items-center justify-between gap-3">
+    <article className={`rounded-[1.7rem] border p-5 shadow-[0_18px_42px_rgba(8,24,29,0.07)] ${toneClasses[tone]}`}>
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-medium">{title}</p>
-          <p className="mt-3 text-2xl font-semibold tracking-tight">{value}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] opacity-65">
+            {title}
+          </p>
+          <p className="mt-4 text-2xl font-semibold tracking-tight sm:text-[1.85rem]">
+            {value}
+          </p>
         </div>
-        <div className="rounded-xl bg-white/70 p-3">{icon}</div>
+        <div className="rounded-2xl border border-white/60 bg-white/65 p-3 shadow-inner">
+          {icon}
+        </div>
       </div>
-      <p className="mt-3 text-sm opacity-80">{description}</p>
+      <p className="mt-4 text-sm leading-6 opacity-80">{description}</p>
     </article>
   );
 }
@@ -168,24 +174,24 @@ function BreakdownCard({
   const maxValue = Math.max(...items.map((item) => item.total), 0);
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+    <article className="rounded-[1.7rem] border border-[#d7e6e8] bg-white/86 p-5 shadow-[0_18px_42px_rgba(8,24,29,0.06)] backdrop-blur-sm">
+      <h3 className="text-base font-semibold text-[#0b2429]">{title}</h3>
       {items.length === 0 ? (
-        <p className="mt-4 text-sm text-slate-500">{emptyLabel}</p>
+        <p className="mt-4 text-sm text-[#678186]">{emptyLabel}</p>
       ) : (
         <div className="mt-4 space-y-3">
           {items.map((item) => {
             const width = maxValue === 0 ? 0 : Math.max((item.total / maxValue) * 100, 8);
 
             return (
-              <div key={item.label} className="space-y-1">
-                <div className="flex items-center justify-between gap-3 text-sm text-slate-700">
+              <div key={item.label} className="space-y-2 rounded-2xl bg-[#f5fafb] px-3 py-3">
+                <div className="flex items-center justify-between gap-3 text-sm text-[#47656b]">
                   <span className="truncate">{item.label}</span>
-                  <span className="font-semibold text-slate-900">{item.total}</span>
+                  <span className="font-semibold text-[#0d2f36]">{item.total}</span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100">
+                <div className="h-2 rounded-full bg-white">
                   <div
-                    className="h-2 rounded-full bg-[#00a3b4]"
+                    className="h-2 rounded-full bg-[linear-gradient(90deg,_#0f7681_0%,_#35b8c7_100%)]"
                     style={{ width: `${width}%` }}
                   />
                 </div>

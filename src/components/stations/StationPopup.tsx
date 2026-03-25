@@ -8,11 +8,11 @@ interface StationPopupProps {
 
 export default function StationPopup({ station }: StationPopupProps) {
   return (
-    <div className="min-w-64 p-2">
-      <h3 className="mb-2 text-sm font-bold text-gray-900">
+    <div className="min-w-72 rounded-[1.1rem] bg-[linear-gradient(180deg,_#ffffff_0%,_#f4fbfb_100%)] p-3">
+      <h3 className="mb-3 text-sm font-bold text-[#0b2429]">
         {station.nombreestacion}
       </h3>
-      <div className="space-y-1 text-xs text-gray-700">
+      <div className="space-y-2 text-xs text-[#33545b]">
         <p>
           <strong>Código estación:</strong> {station.codigoestacion}
         </p>
@@ -35,7 +35,7 @@ export default function StationPopup({ station }: StationPopupProps) {
         <p>
           <strong>Entidad:</strong> {station.entidad}
         </p>
-        <p className="pt-1 text-gray-500">
+        <p className="pt-1 text-[#6d888e]">
           <strong>Fecha observación:</strong>{" "}
           {new Date(station.fechaobservacion).toLocaleString("es-CO", {
             dateStyle: "short",
