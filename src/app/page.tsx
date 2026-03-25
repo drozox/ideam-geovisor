@@ -1,329 +1,269 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import DynamicMap from '@/components/Map/DynamicMap';
-import { useQuery } from '@tanstack/react-query';
-import { ideamService } from '@/services/ideamServices';
-import { X, Filter, ChevronDown, MapPin } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/UI/card';
-import { Badge } from '@/components/UI/badge';
-
+import { useEffect, useState } from "react";
+import DashboardSummaryPanel from "@/components/dashboard/DashboardSummaryPanel";
+import StationHistoryPanel from "@/components/dashboard/StationHistoryPanel";
+import DynamicMap from "@/components/Map/DynamicMap";
+import { Card, CardContent } from "@/components/UI/card";
+import FiltersSidebar from "@/components/stations/FiltersSidebar";
+import StationsList from "@/components/stations/StationsList";
+import { useDashboardSummary } from "@/hooks/useDashboardSummary";
+import { useStationHistory } from "@/hooks/useStationHistory";
+import { useStations } from "@/hooks/useStations";
+import {
+  defaultStationFilters,
+  Station,
+  StationFilters,
+} from "@/types/ideam";
 
 export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    departamento: '',
-    municipio: '',
-    descripcionsensor: ''
-  });
-  const [departamentos, setDepartamentos] = useState<string[]>([]);
-  const [municipios, setMunicipios] = useState<string[]>([]);
-  const [tiposSensor, setTiposSensor] = useState<string[]>([]);
-  const [filteredMunicipios, setFilteredMunicipios] = useState<string[]>([]);
-  const [selectedStation, setSelectedStation] = useState<any>(null);
-  
-  // Obtener datos de estaciones para extraer departamentos, municipios y tipos de sensores
-  const { data: stations } = useQuery({
-    queryKey: ['stations'],
-    queryFn: () => ideamService.getStations(),
-  });
-  
-  // Filtrar estaciones según los filtros aplicados
-  const filteredStations = React.useMemo(() => {
-    if (!stations) return [];
-    if (!filters.departamento && !filters.municipio && !filters.descripcionsensor) {
-      return stations;
-    }
-    
-    return stations.filter(station => {
-      const matchDepartamento = !filters.departamento || station.departamento === filters.departamento;
-      const matchMunicipio = !filters.municipio || station.municipio === filters.municipio;
-      const matchSensor = !filters.descripcionsensor || station.descripcionsensor === filters.descripcionsensor;
-      
-      return matchDepartamento && matchMunicipio && matchSensor;
-    });
-  }, [stations, filters]);
-  
-  // Extraer departamentos, municipios y tipos de sensores únicos
+  const [filters, setFilters] = useState<StationFilters>(defaultStationFilters);
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+  const {
+    summary,
+    isLoading: isDashboardLoading,
+    isError: isDashboardError,
+    error: dashboardError,
+    refetch: refetchDashboard,
+  } = useDashboardSummary();
+  const {
+    filteredStations,
+    filterOptions,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useStations(filters);
+  const {
+    history,
+    isLoading: isHistoryLoading,
+    isError: isHistoryError,
+    error: historyError,
+    refetch: refetchHistory,
+  } = useStationHistory(selectedStation?.codigoestacion ?? null);
+
   useEffect(() => {
-    if (stations) {
-      // Extraer departamentos únicos
-      const uniqueDepartamentos = [...new Set(stations.map(station => station.departamento))].sort();
-      setDepartamentos(uniqueDepartamentos);
-      
-      // Extraer municipios únicos
-      const uniqueMunicipios = [...new Set(stations.map(station => station.municipio))].sort();
-      setMunicipios(uniqueMunicipios);
-      
-      // Extraer tipos de sensores únicos
-      const uniqueTiposSensor = [...new Set(stations.map(station => station.descripcionsensor))].sort();
-      setTiposSensor(uniqueTiposSensor);
+    if (
+      selectedStation &&
+      !filteredStations.some(
+        (station) => station.codigoestacion === selectedStation.codigoestacion,
+      )
+    ) {
+      setSelectedStation(null);
     }
-  }, [stations]);
-  
-  // Filtrar municipios según el departamento seleccionado
-  useEffect(() => {
-    if (stations && filters.departamento) {
-      const municipiosDelDepartamento = [...new Set(
-        stations
-          .filter(station => station.departamento === filters.departamento)
-          .map(station => station.municipio)
-      )].sort();
-      setFilteredMunicipios(municipiosDelDepartamento);
-    } else {
-      setFilteredMunicipios(municipios);
-    }
-  }, [filters.departamento, municipios, stations]);
-  
-  // Manejar cambios en los filtros
-  const handleFilterChange = (filterName: string, value: string) => {
-    setFilters(prev => {
-      // Si cambia el departamento, resetear el municipio
-      if (filterName === 'departamento') {
-        return { ...prev, [filterName]: value, municipio: '' };
+  }, [filteredStations, selectedStation]);
+
+  const handleFilterChange = (
+    filterName: keyof StationFilters,
+    value: string,
+  ) => {
+    setFilters((currentFilters) => {
+      if (filterName === "departamento") {
+        return {
+          ...currentFilters,
+          departamento: value,
+          municipio: "",
+        };
       }
-      return { ...prev, [filterName]: value };
+
+      return {
+        ...currentFilters,
+        [filterName]: value,
+      };
     });
   };
-  
-  // Aplicar filtros
-  const applyFilters = () => {
-    // Aquí se implementaría la lógica para aplicar los filtros
-    console.log('Filtros aplicados:', filters);
-    // Cerrar el sidebar en dispositivos móviles
-    if (window.innerWidth < 768) {
-      setSidebarOpen(false);
-    }
+
+  const handleApplyFilters = () => {
+    return;
   };
-  
-  // Resetear filtros
-  const resetFilters = () => {
-    setFilters({
-      departamento: '',
-      municipio: '',
-      descripcionsensor: ''
-    });
+
+  const handleResetFilters = () => {
+    setFilters(defaultStationFilters);
   };
-  
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative">
-      {/* Header Moderno */}
-      <header className="bg-[#00a3b4] text-white shadow-lg z-10 relative">
-  <div className="flex items-center justify-between px-4 py-3">
-    <div className="flex items-center gap-3">
-      {/* Botón de filtros */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="p-2 rounded-lg text-white hover:bg-[#00b9cc] transition-all flex items-center gap-1"
-        aria-label="Filtros"
-      >
-        <Filter size={18} />
-        <span className="text-sm font-medium">Filtros</span>
-      </button>
-      
-      {/* Logo y Título */}
-      <div className="flex items-center gap-3">
-        <div className="p-1">
+    <main className="relative min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <header className="relative z-10 bg-[#00a3b4] text-white shadow-lg">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="p-1">
+              <svg
+                className="h-6 w-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-white sm:text-xl">
+                IDEAM Geovisor
+              </h1>
+              <p className="text-sm text-white/90">
+                Visualizador de estaciones meteorologicas
+              </p>
+            </div>
+          </div>
+
+          <nav className="hidden gap-2 md:flex">
+            {["Dashboard", "Estaciones"].map((item) => (
+              <button
+                key={item}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-white transition-all hover:bg-[#00b9cc]"
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="space-y-6">
+          <DashboardSummaryPanel
+            summary={summary}
+            isLoading={isDashboardLoading}
+            isError={isDashboardError}
+            error={dashboardError}
+            onRetry={() => void refetchDashboard()}
+          />
+
+          <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+            <aside className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm xl:sticky xl:top-24 xl:h-[calc(100vh-7.5rem)] xl:min-h-0">
+              <div className="flex h-full min-h-0 flex-col">
+                <FiltersSidebar
+                  filters={filters}
+                  options={filterOptions}
+                  onFilterChange={handleFilterChange}
+                  onApply={handleApplyFilters}
+                  onReset={handleResetFilters}
+                />
+                <StationsList
+                  stations={filteredStations}
+                  selectedStation={selectedStation}
+                  onSelectStation={setSelectedStation}
+                />
+              </div>
+            </aside>
+
+            <Card className="overflow-hidden border-0 bg-transparent shadow-none">
+              <CardContent className="space-y-4 p-0">
+                <div className="rounded-lg bg-white p-6 shadow">
+                  <div className="mb-4">
+                    <h2 className="mb-2 text-xl font-semibold text-gray-900">
+                      Mapa de estaciones
+                    </h2>
+                    <p className="text-gray-600">
+                      Visualizacion geografica de estaciones IDEAM con filtros por
+                      ubicacion y sensor.
+                    </p>
+                  </div>
+
+                  {isLoading ? (
+                    <LoadingState />
+                  ) : isError ? (
+                    <ErrorState
+                      message={
+                        error instanceof Error
+                          ? error.message
+                          : "Ocurrio un error al cargar las estaciones."
+                      }
+                      onRetry={() => void refetch()}
+                    />
+                  ) : (
+                    <DynamicMap
+                      stations={filteredStations}
+                      selectedStation={selectedStation}
+                      onSelectStation={setSelectedStation}
+                    />
+                  )}
+                </div>
+
+                <StationHistoryPanel
+                  station={selectedStation}
+                  history={history}
+                  isLoading={isHistoryLoading}
+                  isError={isHistoryError}
+                  error={historyError}
+                  onRetry={() => void refetchHistory()}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="flex h-96 items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600" />
+        <h3 className="mb-2 text-lg font-semibold text-gray-800">
+          Cargando estaciones...
+        </h3>
+        <p className="mb-2 text-sm text-gray-600">
+          Obteniendo datos de las estaciones meteorologicas.
+        </p>
+        <div className="mx-auto mt-4 h-2 w-64 rounded-full bg-gray-200">
+          <div className="h-2 animate-pulse rounded-full bg-blue-600" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="flex h-96 items-center justify-center bg-red-50">
+      <div className="mx-auto max-w-md p-6 text-center">
+        <div className="mb-4">
           <svg
-            className="h-6 w-6 text-white"
+            className="mx-auto mb-4 h-12 w-12 text-red-500"
             fill="none"
-            stroke="currentColor"
             viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
+          <h3 className="mb-2 text-lg font-bold text-red-700">
+            Error al cargar las estaciones
+          </h3>
         </div>
-        <div>
-          <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-            IDEAM Geovisor
-          </h1>
-          <p className="text-sm text-white opacity-90">
-            Visualizador de Estaciones Meteorológicas
+
+        <div className="mb-4 rounded-lg bg-white p-4 shadow-sm">
+          <p className="mb-2 text-sm text-red-600">{message}</p>
+          <p className="text-xs text-gray-500">
+            Verifica tu conexion o el token configurado y vuelve a intentarlo.
           </p>
         </div>
-      </div>
 
-      {/* Nav moderno */}
-      <nav className="hidden md:flex gap-2">
-        {["Dashboard", "Estaciones" ].map((item) => (
-          <button
-            key={item}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-[#00b9cc] transition-all"
-          >
-            {item}
-          </button>
-        ))}
-      </nav>
+        <button
+          onClick={onRetry}
+          className="rounded-md bg-red-600 px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-red-700"
+        >
+          Reintentar carga
+        </button>
+      </div>
     </div>
-  </div>
-</header>
-
-
-      {/* Sidebar para filtros */}
-      <div className={`fixed top-24 bottom-0  left-0 z-20 w-80 bg-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out overflow-y-auto`}>
-        <div className="h-full flex flex-col p-4">
-          <div className="flex items-center justify-between mb-6 flex-shrink-0 ">
-            <h2 className="text-lg font-semibold text-gray-900">Filtros</h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded-full hover:bg-gray-100"
-              aria-label="Cerrar"
-            >
-              <X size={20} className="text-gray-500" />
-            </button>
-          </div>
-          
-          {/* Filtro por Departamento */}
-          <div className="mb-4">
-            <label htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-1">
-              Departamento
-            </label>
-            <div className="relative">
-              <select
-                id="departamento"
-                value={filters.departamento}
-                onChange={(e) => handleFilterChange('departamento', e.target.value)}
-                className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-[#00a3b4] focus:outline-none focus:ring-1 focus:ring-[#00a3b4]"
-              >
-                <option value="">Todos los departamentos</option>
-                {departamentos.map((depto) => (
-                  <option key={depto} value={depto}>{depto}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                <ChevronDown size={16} />
-              </div>
-            </div>
-          </div>
-          
-          {/* Filtro por Municipio */}
-          <div className="mb-4">
-            <label htmlFor="municipio" className="block text-sm font-medium text-gray-700 mb-1">
-              Municipio
-            </label>
-            <div className="relative">
-              <select
-                id="municipio"
-                value={filters.municipio}
-                onChange={(e) => handleFilterChange('municipio', e.target.value)}
-                className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-[#00a3b4] focus:outline-none focus:ring-1 focus:ring-[#00a3b4]"
-                disabled={!filters.departamento}
-              >
-                <option value="">Todos los municipios</option>
-                {filteredMunicipios.map((muni) => (
-                  <option key={muni} value={muni}>{muni}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                <ChevronDown size={16} />
-              </div>
-            </div>
-          </div>
-          
-          {/* Filtro por Tipo de Sensor */}
-          <div className="mb-4">
-            <label htmlFor="tipoSensor" className="block text-sm font-medium text-gray-700 mb-1">
-              Tipo de Sensor
-            </label>
-            <div className="relative">
-              <select
-                id="tipoSensor"
-                value={filters.descripcionsensor}
-                onChange={(e) => handleFilterChange('descripcionsensor', e.target.value)}
-                className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-[#00a3b4] focus:outline-none focus:ring-1 focus:ring-[#00a3b4]"
-              >
-                <option value="">Todos los sensores</option>
-                {tiposSensor.map((tipo) => (
-                  <option key={tipo} value={tipo}>{tipo}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                <ChevronDown size={16} />
-              </div>
-            </div>
-          </div>
-          
-          {/* Botones de acción */}
-          <div className="flex gap-2 mb-6">
-            <button
-              onClick={applyFilters}
-              className="flex-1 bg-[#00a3b4] hover:bg-[#00b9cc] text-white py-2 px-4 rounded-md text-sm font-medium transition-colors"
-            >
-              Aplicar Filtros
-            </button>
-            <button
-              onClick={resetFilters}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm font-medium transition-colors"
-            >
-              Resetear
-            </button>
-          </div>
-          
-          {/* Lista de Estaciones */}
-          <Card className="flex-1 overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Estaciones Meteorológicas</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="h-200 overflow-y-auto">
-                {filteredStations?.map((station) => (
-                  <div
-                    key={station.codigoestacion}
-                    className={`p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedStation?.codigoestacion === station.codigoestacion ? "bg-blue-50 border-l-4 border-l-[#00a3b4]" : ""
-                    }`}
-                    onClick={() => setSelectedStation(station)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <h4 className="font-medium text-sm">{station.nombreestacion}</h4>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {station.municipio}, {station.departamento}
-                        </p>
-                        <p className="text-xs text-gray-500">Código: {station.codigoestacion}</p>
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {station.descripcionsensor.split(" ")[0]}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      
-      {/* Overlay para cerrar el sidebar en móviles */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      
-      {/* Contenido principal */}
-      <div className={`max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 ${sidebarOpen ? 'md:ml-80' : ''}`}>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Mapa de Estaciones
-            </h2>
-            <p className="text-gray-600">
-              Visualización del mapa base
-            </p>
-          </div>
-          
-          {/* Aquí va nuestro mapa */}
-          <DynamicMap filters={filters} selectedStation={selectedStation} />
-        </div>
-      </div>
-    </main>
   );
 }

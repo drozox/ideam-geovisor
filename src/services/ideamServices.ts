@@ -1,70 +1,72 @@
-import axios from 'axios';
-import { Station } from '@/types/ideam';
+import {
+  DashboardSummary,
+  Station,
+  StationHistoryResponse,
+  StationsApiResponse,
+} from "@/types/ideam";
 
-const API_URL = 'https://www.datos.gov.co/resource/57sv-p2fu.json';
-const APP_TOKEN = process.env.NEXT_PUBLIC_IDEAM_APP_TOKEN;
-
-function uniqueStations(stations: Station[]): Station[] {
-  const map = new Map<string, Station>();
-  stations.forEach(st => {
-    if (!map.has(st.codigoestacion)) {
-      map.set(st.codigoestacion, st);
-    }
-  });
-  return Array.from(map.values());
-}
+const API_URL = "/api/stations";
 
 export class IdeamService {
+  private async requestJson<T>(url: string): Promise<T> {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+
+      throw new Error(body?.error ?? "No fue posible cargar datos del geovisor.");
+    }
+
+    return (await response.json()) as T;
+  }
+
   async getStations(): Promise<Station[]> {
     try {
-      const response = await axios.get<Station[]>(API_URL, {
-        params: {
-          $limit: 5000,
-          $$app_token: APP_TOKEN,
-        },
-      });
-
-      return uniqueStations(response.data);
+      const response = await this.requestJson<StationsApiResponse>(API_URL);
+      return response.data;
     } catch (error) {
-      console.error('Error obteniendo estaciones del IDEAM', error);
-      return [];
+      console.error("Error obteniendo estaciones desde la API interna", error);
+      throw new Error("No fue posible cargar las estaciones del IDEAM.");
     }
   }
 
   async getStationById(id: string): Promise<Station | undefined> {
     try {
-      const response = await axios.get<Station[]>(API_URL, {
-        params: {
-          codigoestacion: id,
-          $$app_token: APP_TOKEN,
-        },
-      });
-
-      return response.data[0];
+      const response = await this.requestJson<{ data: Station }>(`${API_URL}/${id}`);
+      return response.data;
     } catch (error) {
-      console.error('Error obteniendo estación por id', error);
-      return undefined;
+      console.error("Error obteniendo estacion por id desde la API interna", error);
+      throw new Error("No fue posible cargar la estación solicitada.");
     }
   }
 
-  async getFilteredStations(filters: {
-    departamento?: string;
-    municipio?: string;
-    categoria?: string;
-  }): Promise<Station[]> {
+  async getDashboardSummary(): Promise<DashboardSummary> {
     try {
-      const response = await axios.get<Station[]>(API_URL, {
-        params: {
-          ...filters,
-          $limit: 5000,
-          $$app_token: APP_TOKEN,
-        },
-      });
-
-      return uniqueStations(response.data);
+      const response = await this.requestJson<{ data: DashboardSummary }>(
+        "/api/dashboard/summary",
+      );
+      return response.data;
     } catch (error) {
-      console.error('Error filtrando estaciones', error);
-      return [];
+      console.error("Error obteniendo resumen del dashboard", error);
+      throw new Error("No fue posible cargar el dashboard historico.");
+    }
+  }
+
+  async getStationHistory(stationCode: string): Promise<StationHistoryResponse> {
+    try {
+      const response = await this.requestJson<{ data: StationHistoryResponse }>(
+        `${API_URL}/${stationCode}/history`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error obteniendo historico de estacion", error);
+      throw new Error("No fue posible cargar el historico de la estacion.");
     }
   }
 }
